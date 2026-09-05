@@ -23,11 +23,11 @@ export default function Home() {
   ];
 
   return (
-    <div className="p-8 md:p-12 overflow-y-auto w-full h-full relative z-10">
-      <header className="mb-12 flex justify-between items-end">
+    <div className="p-4 md:p-12 overflow-y-auto w-full h-full relative z-10">
+      <header className="mb-8 md:mb-12 flex justify-between items-end">
         <div>
-          <h2 className="text-red-600 font-bold tracking-widest uppercase text-sm mb-2">Seizoen 2026</h2>
-          <h1 className="text-5xl font-black text-slate-900 tracking-tight">
+          <h2 className="text-red-600 font-bold tracking-widest uppercase text-xs md:text-sm mb-1 md:mb-2">Seizoen 2026</h2>
+          <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
             Wedstrijd<span className="text-red-600">verslag</span>
           </h1>
         </div>
@@ -37,22 +37,22 @@ export default function Home() {
       <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden mb-12 shadow-[0_20px_50px_rgba(0,0,0,0.05)] relative">
         <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-red-700 via-red-500 to-red-400"></div>
         
-        <div className="p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="p-4 md:p-10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
           {/* Away Team */}
           <div className="flex-1 text-center md:text-right">
-            <h3 className="text-xl md:text-2xl font-bold text-slate-500 uppercase tracking-wide">City Pirates<br/>Antwerpen</h3>
+            <h3 className="text-lg md:text-2xl font-bold text-slate-500 uppercase tracking-wide">City Pirates<br className="hidden md:block"/> Antwerpen</h3>
           </div>
           
           {/* Score */}
-          <div className="shrink-0 flex items-center justify-center gap-4 bg-slate-50 px-8 py-6 rounded-2xl border border-slate-100 shadow-inner">
-            <div className="text-5xl md:text-7xl font-black text-slate-700">5</div>
-            <div className="text-3xl text-slate-300 font-black">-</div>
-            <div className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-800 drop-shadow-sm">15</div>
+          <div className="shrink-0 flex items-center justify-center gap-2 md:gap-4 bg-slate-50 px-4 md:px-8 py-4 md:py-6 rounded-2xl border border-slate-100 shadow-inner w-full md:w-auto">
+            <div className="text-4xl md:text-7xl font-black text-slate-700">5</div>
+            <div className="text-2xl md:text-3xl text-slate-300 font-black">-</div>
+            <div className="text-4xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-800 drop-shadow-sm">15</div>
           </div>
 
           {/* Home Team */}
           <div className="flex-1 text-center md:text-left">
-            <h3 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-wide">HRS<br/>Haasdonk</h3>
+            <h3 className="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-wide">HRS<br className="hidden md:block"/> Haasdonk</h3>
           </div>
         </div>
 
