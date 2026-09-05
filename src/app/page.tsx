@@ -1,122 +1,81 @@
-"use client";
-
 import Image from "next/image";
-import { useState } from "react";
 
-export default function Home() {
-  const [localPhotos, setLocalPhotos] = useState<string[]>([]);
-
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      const urls = filesArray.map(file => URL.createObjectURL(file));
-      setLocalPhotos(prev => [...prev, ...urls]);
-    }
-  };
-
-  const scorers = [
-    { name: "Gaston", goals: 10 },
-    { name: "Noah", goals: 2 },
-    { name: "Joachim", goals: 1 },
-    { name: "Lucas", goals: 1 },
-    { name: "Basiel", goals: 1 },
-  ];
-
+export default function NextMatchPage() {
   return (
-    <div className="p-4 md:p-12 overflow-y-auto w-full h-full relative z-10">
-      <header className="mb-8 md:mb-12 flex justify-between items-end">
-        <div>
-          <h2 className="text-red-600 font-bold tracking-widest uppercase text-xs md:text-sm mb-1 md:mb-2">Seizoen 2026</h2>
-          <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
-            Wedstrijd<span className="text-red-600">verslag</span>
-          </h1>
-        </div>
-      </header>
-
-      {/* MATCH SCOREBOARD */}
-      <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden mb-12 shadow-[0_20px_50px_rgba(0,0,0,0.05)] relative">
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-red-700 via-red-500 to-red-400"></div>
-        
-        <div className="p-4 md:p-10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
-          {/* Away Team */}
-          <div className="flex-1 text-center md:text-right">
-            <h3 className="text-lg md:text-2xl font-bold text-slate-500 uppercase tracking-wide">City Pirates<br className="hidden md:block"/> Antwerpen</h3>
-          </div>
-          
-          {/* Score */}
-          <div className="shrink-0 flex items-center justify-center gap-2 md:gap-4 bg-slate-50 px-4 md:px-8 py-4 md:py-6 rounded-2xl border border-slate-100 shadow-inner w-full md:w-auto">
-            <div className="text-4xl md:text-7xl font-black text-slate-700">5</div>
-            <div className="text-2xl md:text-3xl text-slate-300 font-black">-</div>
-            <div className="text-4xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-800 drop-shadow-sm">15</div>
-          </div>
-
-          {/* Home Team */}
-          <div className="flex-1 text-center md:text-left">
-            <h3 className="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-wide">HRS<br className="hidden md:block"/> Haasdonk</h3>
-          </div>
-        </div>
-
-        <div className="bg-slate-50 border-t border-slate-100 p-4 text-center text-sm font-bold text-slate-500 uppercase tracking-widest">
-          Zaterdag 5 September • Competitie
-        </div>
+    <div className="p-4 md:p-12 overflow-y-auto w-full h-full relative z-10 bg-slate-50">
+      
+      <div className="flex flex-col items-center justify-center mb-10 mt-6">
+        <Image src="/icon.png" alt="HRS Haasdonk Logo" width={120} height={120} className="mb-4 drop-shadow-lg" />
+        <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-800 drop-shadow-sm text-center">
+          U8 HAASDONK
+        </h1>
+        <p className="text-slate-500 font-bold uppercase tracking-widest mt-2">Officiële Teampagina</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-        {/* SCORERS */}
-        <div className="lg:col-span-1 bg-white rounded-3xl border border-slate-200 p-8 shadow-[0_10px_30px_rgba(0,0,0,0.03)]">
-          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-            <span className="bg-red-50 text-red-600 p-2.5 rounded-xl border border-red-100 shadow-sm">⚽</span> Doelpuntenmakers
-          </h3>
-          <ul className="space-y-3">
-            {scorers.map((s, i) => (
-              <li key={i} className="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100 transition-colors hover:bg-red-50 hover:border-red-100">
-                <span className="font-bold text-slate-700">{s.name}</span>
-                <span className="bg-white border border-red-200 text-red-700 px-3 py-1 rounded-lg font-black text-sm shadow-sm">
-                  {s.goals}x
-                </span>
-              </li>
-            ))}
-          </ul>
+      <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-red-700 via-red-600 to-red-500 p-4 text-center">
+          <h2 className="text-white font-black text-xl tracking-widest uppercase">Volgende Wedstrijd</h2>
         </div>
         
-        {/* FEATURED MATCH PHOTO */}
-        <div className="lg:col-span-2 relative aspect-[16/9] rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.06)] border border-slate-200 group bg-slate-200">
-          <Image 
-            src="/images/match1.jpg" 
-            alt="Wedstrijd foto" 
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-          <div className="absolute bottom-8 left-8 right-8">
-            <p className="text-white font-black text-2xl drop-shadow-md">Team foto na de overwinning!</p>
+        <div className="p-6 md:p-8">
+          <div className="text-center mb-8">
+            <h3 className="text-slate-500 font-bold uppercase tracking-widest text-sm mb-1">COMPETITION</h3>
+            <p className="text-2xl font-black text-slate-800">SEP 12</p>
+            <p className="text-5xl font-black text-red-600 drop-shadow-sm mt-1">9:30 AM</p>
           </div>
-        </div>
-      </div>
 
-      {/* GALLERY */}
-      <div className="flex flex-col md:flex-row justify-between items-end mb-8 border-b border-slate-200 pb-4">
-        <div>
-          <h2 className="text-3xl font-black text-slate-900">Fotogalerij</h2>
-          <p className="text-slate-500 mt-1 font-medium">Sfeerbeelden van de wedstrijd</p>
-        </div>
-        <label className="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold cursor-pointer transition-all shadow-[0_4px_14px_0_rgba(220,38,38,0.39)] hover:shadow-[0_6px_20px_rgba(220,38,38,0.23)] hover:-translate-y-0.5">
-          + Foto's Toevoegen
-          <input type="file" multiple accept="image/*" className="hidden" onChange={handlePhotoUpload} />
-        </label>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-20">
-        <div className="relative aspect-square rounded-2xl overflow-hidden shadow-md border border-slate-200 group bg-slate-200">
-          <Image src="/images/match1.jpg" alt="Gallery" fill className="object-cover transition-transform duration-500 group-hover:scale-110 cursor-pointer" />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none"></div>
-        </div>
-        {localPhotos.map((url, i) => (
-          <div key={i} className="relative aspect-square rounded-2xl overflow-hidden shadow-md border border-slate-200 group bg-slate-200">
-            <Image src={url} alt="Local Upload" fill className="object-cover transition-transform duration-500 group-hover:scale-110 cursor-pointer" />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none"></div>
+          <div className="flex justify-between items-center mb-10 relative">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-300 font-black text-2xl italic">VS</div>
+            
+            <div className="flex flex-col items-center flex-1 text-center">
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-red-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
+                 <Image src="/icon.png" alt="Home Team" fill className="object-contain p-2" />
+              </div>
+              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Herleving Red Star<br/>Haasdonk (GU8A)</p>
+            </div>
+            
+            <div className="flex flex-col items-center flex-1 text-center">
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-slate-100 shadow-md flex items-center justify-center mb-3 text-3xl">
+                🛡️
+              </div>
+              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Verbr Zwijndrecht<br/>(U8)</p>
+            </div>
           </div>
-        ))}
+
+          <div className="grid grid-cols-2 gap-4 mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+            <div>
+              <p className="text-xs text-slate-400 font-bold uppercase">Game length</p>
+              <p className="text-slate-800 font-bold">60'</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-bold uppercase">Playing style</p>
+              <p className="text-slate-800 font-bold">5x5</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-bold uppercase">Periods</p>
+              <p className="text-slate-800 font-bold">4 (4x15')</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-bold uppercase">Staff</p>
+              <p className="text-slate-800 font-bold text-sm">Ben Amar Mehdi (T)</p>
+            </div>
+          </div>
+
+          <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+            <h4 className="font-black text-red-800 mb-2 uppercase text-sm tracking-wider">Dressing room</h4>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-red-400 font-bold uppercase">Home</p>
+                <p className="text-red-900 font-medium text-sm">Herleving Red Star Haasdonk - Kleedkamer 1 (groot) (Ploegje 1) (14p, 09:30-10:45)</p>
+              </div>
+              <div>
+                <p className="text-xs text-red-400 font-bold uppercase">Away</p>
+                <p className="text-red-900 font-medium text-sm">Herleving Red Star Haasdonk - Kleedkamer 2 (groot) (Ploegje 2) (14p, 09:30-10:45)</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );
