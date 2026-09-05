@@ -35,10 +35,10 @@ export default function NextMatchPage() {
             </div>
             
             <div className="flex flex-col items-center flex-1 text-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-slate-100 shadow-md flex items-center justify-center mb-3 text-3xl">
-                🛡️
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-slate-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
+                <Image src="/images/zwijndrecht.png" alt="Away Team" fill className="object-contain p-2" />
               </div>
-              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Verbr Zwijndrecht<br/>(U8)</p>
+              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Verbroedering<br/>Zwijndrecht (U8)</p>
             </div>
           </div>
 
