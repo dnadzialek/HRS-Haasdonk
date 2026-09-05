@@ -53,14 +53,14 @@ export default function RootLayout({
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col bg-slate-50 overflow-hidden relative">
+        <main className="flex-1 flex flex-col bg-slate-50 overflow-hidden relative min-h-0">
           {/* Top header only visible on mobile */}
-          <div className="md:hidden bg-white p-4 text-center shadow-sm border-b border-slate-200 z-10 shrink-0 flex items-center justify-center gap-3">
+          <Link href="/" className="md:hidden bg-white p-4 text-center shadow-sm border-b border-slate-200 z-10 shrink-0 flex items-center justify-center gap-3">
             <img src="/opengraph-image.png" alt="Logo" className="w-8 h-8 object-contain" />
             <h1 className="text-xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-800">
               U8 HAASDONK
             </h1>
-          </div>
+          </Link>
           
           <div className="flex-1 overflow-y-auto w-full h-full relative">
             {children}
