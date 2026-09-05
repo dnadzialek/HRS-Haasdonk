@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="nl" suppressHydrationWarning>
-      <body className={`${inter.className} bg-slate-50 text-slate-900 flex flex-col-reverse md:flex-row min-h-[100dvh] overflow-hidden selection:bg-red-600 selection:text-white`} suppressHydrationWarning>
+      <body className={`${inter.className} bg-slate-50 text-slate-900 flex flex-col-reverse md:flex-row h-[100dvh] max-h-[100dvh] w-full overflow-hidden selection:bg-red-600 selection:text-white`} suppressHydrationWarning>
         
         {/* Navigation (Sidebar on Desktop, Bottom bar on Mobile) */}
         <aside className="w-full md:w-72 bg-white shadow-[0_-4px_24px_rgba(0,0,0,0.05)] md:shadow-[4px_0_24px_rgba(0,0,0,0.05)] border-t md:border-t-0 md:border-r border-slate-200 flex flex-row md:flex-col shrink-0 z-20 relative">
