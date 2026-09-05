@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HRS Haasdonk - 3D Training (U8 5v5)</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #87CEEB; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; touch-action: none; }
+    #ui { position: absolute; top: 15px; left: 15px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); pointer-events: none; z-index: 10; }
+    h1 { margin: 0 0 5px 0; color: #ff3333; text-shadow: 2px 2px 0px white, -1px -1px 0px white; font-size: 1.5rem; }
+    h2 { margin: 0 0 10px 0; color: #ffffaa; font-size: 1.2rem; }
+    p { margin: 3px 0; font-size: 1rem; font-weight: bold; }
+    
+    #scenario-info { position: absolute; top: 15px; right: 15px; width: 280px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px; color: white; border: 2px solid #ff3333; pointer-events: none; }
+    #scenario-title { font-size: 1.1rem; font-weight: bold; color: #ffffaa; margin-bottom: 5px; text-transform: uppercase; }
+    #scenario-desc { font-size: 0.9rem; line-height: 1.3; }
+    
+    #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 30; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
+    #start-btn { padding: 15px 40px; font-size: 1.5rem; background: #e60000; color: white; border: 3px solid white; border-radius: 10px; cursor: pointer; font-weight: bold; transition: transform 0.2s, background 0.2s; margin-top: 20px; }
+    #start-btn:hover { transform: scale(1.05); background: #ff3333; }
+    
+    .role-btn { padding: 10px 20px; font-size: 1.1rem; background: #333; color: white; border: 2px solid transparent; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .role-btn:hover { background: #555; }
+    .role-btn.active { border: 2px solid #00ff00; background: #225522; font-weight: bold; }
+
+    #crosshair { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; border: 3px solid white; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: difference; z-index: 10; }
+    #message { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); font-size: 2.5rem; color: yellow; text-shadow: 4px 4px 10px black; font-weight: 900; display: none; pointer-events: none; z-index: 10; text-align: center; width: 100%; }
+
+    #joystick-zone { position: absolute; bottom: 30px; left: 30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); touch-action: none; display: none; z-index: 15; }
+    #joystick-knob { position: absolute; top: 35px; left: 35px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.8); pointer-events: none; }
+    #mobile-hint { display: none; position: absolute; bottom: 40px; right: 40px; color: rgba(255,255,255,0.8); font-weight: bold; font-size: 1rem; text-align: center; text-shadow: 1px 1px 2px black; z-index: 15; pointer-events: none; }
+    
+    @media (max-width: 768px) {
+      #scenario-info { width: calc(100% - 30px); top: auto; bottom: 15px; left: 15px; padding: 10px; }
+      #joystick-zone { bottom: 120px; }
+      #mobile-hint { bottom: 120px; }
+      #ui { display: none; }
+      #message { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen">
+    <h1 style="font-size: 3rem; margin-bottom: 10px;">HRS Haasdonk U8</h1>
+    <h2 style="font-size: 1.5rem; margin-bottom: 15px; color: #ffffaa;">Kies je positie (20 Oefeningen per positie)</h2>
+    
+    <div id="role-select" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; max-width: 600px; margin-bottom: 20px;">
+      <button class="role-btn active" data-role="linkerflank">🏃‍♂️ Linkerflank</button>
+      <button class="role-btn" data-role="rechterflank">🏃‍♂️ Rechterflank</button>
+      <button class="role-btn" data-role="verdediger">🛡️ Verdediger</button>
+      <button class="role-btn" data-role="aanvaller">⚽ Aanvaller</button>
+      <button class="role-btn" data-role="doelman">🧤 Doelman</button>
+    </div>
+
+    <div id="desktop-instructions" style="margin-bottom: 20px; font-size: 1rem; line-height: 1.4;">
+      <strong>DENK SNEL!</strong> De tegenstander komt op je af. Als je te traag bent, pakken ze de bal!<br>
+      Kijk rond (Muis) | Beweeg (WASD) | Pass (Linkerklik)
+    </div>
+    
+    <div id="mobile-instructions" style="display:none; margin-bottom: 20px; font-size: 1rem; line-height: 1.4;">
+      <strong>DENK SNEL!</strong> De tegenstander komt op je af!<br>
+      Joystick (Linkerkant) | Kijken (Vegen) | Passen (Tik)
+    </div>
+    
+    <button id="start-btn">Start Training</button>
+  </div>
+
+  <div id="ui">
+    <h1>HRS Haasdonk</h1><h2>3D Training</h2>
+    <p>🔴 Wij</p><p>🟢 Zij</p>
+  </div>
+  
+  <div id="scenario-info">
+    <div id="scenario-title">Laden...</div>
+    <div id="scenario-desc">Even geduld...</div>
+  </div>
+  
+  <div id="crosshair"></div>
+  <div id="message"></div>
+
+  <div id="joystick-zone"><div id="joystick-knob"></div></div>
+  <div id="mobile-hint">Kijken (Swipe)<br>Passen (Tik)</div>
+
+  <!-- Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- PointerLockControls -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+
+  <script>
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
+    
+    if(isMobile) {
+      document.getElementById('desktop-instructions').style.display = 'none';
+      document.getElementById('mobile-instructions').style.display = 'block';
+    }
+
+    let camera, scene, renderer, controls;
+    let raycaster = new THREE.Raycaster();
+    let ball, entitiesGroup = new THREE.Group();
+    
+    let isGameRunning = false, passing = false, passTarget = null, hasDribbledIn = true;
+    let currentRole = 'linkerflank';
+    let scenarioCount = 1;
+    const MAX_SCENARIOS = 20;
+    
+    let moveState = { forward: false, backward: false, left: false, right: false };
+    let touchMoveID = null, touchLookID = null, joystickDelta = {x: 0, y: 0}, lookEuler = new THREE.Euler(0, 0, 0, 'YXZ'), lastLookPos = {x: 0, y: 0}, isTapping = false;
+    let prevTime = performance.now();
+
+    // UI Logic
+    document.querySelectorAll('.role-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        currentRole = e.target.dataset.role;
+      });
+    });
+
+    // Generator
+    const j = (val, amt=2.5) => val + (Math.random()*amt*2 - amt); // Add Jitter (randomness)
+
+    function generateScenario(role, index) {
+      let sc = { title: `${index}/${MAX_SCENARIOS}: `, desc: "", playerPos: {x:0, z:0}, mustDribbleIn: false, entities: [] };
+      let r = Math.random();
+      
+      let teammatesData = []; 
+      
+      if (role === 'doelman') {
+        sc.title += "Uitverdedigen (Keeper)"; sc.desc = "Snelle pass! Ze zetten druk!";
+        sc.playerPos = {x: 0, z: 16};
+        // 1-2-1 Formation
+        teammatesData.push({ x: j(0,1), z: j(8,1), isCovered: Math.random()>0.5 }); // Defender
+        teammatesData.push({ x: j(-10,2), z: j(2,2), isCovered: Math.random()>0.5 }); // Left Winger
+        teammatesData.push({ x: j(10,2), z: j(2,2), isCovered: Math.random()>0.5 }); // Right Winger
+        teammatesData.push({ x: j(0,2), z: j(-8,2), isCovered: false }); // Striker
+      } else {
+        sc.entities.push({ color: 0x3366ff, x: j(0, 1), z: 17, status: 'keeper' });
+        if (role === 'verdediger') {
+          sc.title += "Opbouw (Verdediger)"; sc.desc = "Speel de bal naar voren of de flanken. Denk snel!";
+          sc.playerPos = {x: j(0,3), z: 10};
+          teammatesData.push({ x: j(-10,2), z: j(2,3), isCovered: Math.random()>0.5 });
+          teammatesData.push({ x: j(10,2), z: j(2,3), isCovered: Math.random()>0.5 });
+          teammatesData.push({ x: j(0,3), z: j(-2,3), isCovered: true });
+        } else if (role === 'linkerflank') {
+          if (r < 0.33) {
+            sc.title += "Indribbelen Links"; sc.desc = "Bal is uit. DRIBBEL het veld in (WASD/Joystick) en pas!";
+            sc.playerPos = {x: -12.5, z: j(0, 5)}; sc.mustDribbleIn = true;
+          } else if (r < 0.66) {
+            sc.title += "Hoekschop Links"; sc.desc = "Corner! Geef een strakke voorzet voor het doel!";
+            sc.playerPos = {x: -12.5, z: -17.5};
+          } else {
+            sc.title += "Aanval Links"; sc.desc = "Je bent op de flank. Zoek een medespeler voor het doel!";
+            sc.playerPos = {x: j(-10,2), z: j(-5,4)};
+          }
+          teammatesData.push({ x: j(0,3), z: j(8,3), isCovered: false });
+          teammatesData.push({ x: j(8,3), z: j(-2,3), isCovered: true });
+          teammatesData.push({ x: j(0,3), z: j(-10,3), isCovered: Math.random()>0.5 });
+        } else if (role === 'rechterflank') {
+          if (r < 0.33) {
+            sc.title += "Indribbelen Rechts"; sc.desc = "Bal is uit. DRIBBEL het veld in (WASD/Joystick) en pas!";
+            sc.playerPos = {x: 12.5, z: j(0, 5)}; sc.mustDribbleIn = true;
+          } else if (r < 0.66) {
+            sc.title += "Hoekschop Rechts"; sc.desc = "Corner! Geef een strakke voorzet voor het doel!";
+            sc.playerPos = {x: 12.5, z: -17.5};
+          } else {
+            sc.title += "Aanval Rechts"; sc.desc = "Je bent op de flank. Zoek een medespeler voor het doel!";
+            sc.playerPos = {x: j(10,2), z: j(-5,4)};
+          }
+          teammatesData.push({ x: j(0,3), z: j(8,3), isCovered: false });
+          teammatesData.push({ x: j(-8,3), z: j(-2,3), isCovered: true });
+          teammatesData.push({ x: j(0,3), z: j(-10,3), isCovered: Math.random()>0.5 });
+        } else if (role === 'aanvaller') {
+          sc.title += "Aanval Centrum"; sc.desc = "Kaats de bal of zoek een flankspeler. Snel!";
+          // Napastnik niżej (bliżej środka/własnej połowy)
+          sc.playerPos = {x: j(0,3), z: j(2,3)};
+          // Obrońca z tyłu
+          teammatesData.push({ x: j(0,2), z: j(12,2), isCovered: false });
+          // Skrzydłowi bardzo wysoko (głęboko na połowie przeciwnika)
+          teammatesData.push({ x: j(-11,2), z: j(-14,2), isCovered: true });
+          teammatesData.push({ x: j(11,2), z: j(-14,2), isCovered: Math.random()>0.5 });
+        }
+      }
+      
+      teammatesData.forEach(t => {
+         t.timeOffset = Math.random() * Math.PI * 2;
+         sc.entities.push({ color: 0xff0000, x: t.x, z: t.z, status: t.isCovered ? 'covered_teammate' : 'open_teammate', timeOffset: t.timeOffset });
+      });
+
+      let pX = sc.playerPos.x, pZ = sc.playerPos.z;
+      let dirX = pX > 0 ? -1 : 1, dirZ = pZ > 0 ? -1 : 1;
+      
+      let isCorner = sc.title.toLowerCase().includes('hoekschop');
+      let isThrowIn = sc.title.toLowerCase().includes('indribbelen');
+      let isGoalKick = sc.title.toLowerCase().includes('uitverdedigen');
+      
+      let minDist = 0;
+      if (isCorner || isGoalKick) minDist = 8.0;
+      else if (isThrowIn) minDist = 3.0;
+
+      let pressX = pX + dirX * Math.max(4, minDist * 0.8);
+      let pressZ = pZ + dirZ * Math.max(6, minDist * 0.8);
+      
+      let distPress = Math.sqrt((pressX - pX)**2 + (pressZ - pZ)**2);
+      if (distPress < minDist) {
+         let fixX = pressX - pX, fixZ = pressZ - pZ;
+         let fixLen = Math.sqrt(fixX*fixX + fixZ*fixZ) || 1;
+         pressX = pX + (fixX / fixLen) * minDist;
+         pressZ = pZ + (fixZ / fixLen) * minDist;
+      }
+      
+      sc.entities.push({ color: 0x00cc00, x: pressX, z: pressZ, status: 'opponent_press' }); 
+      
+      for(let i=0; i<3; i++) {
+         if(i < teammatesData.length) {
+            let t = teammatesData[i];
+            let dX = pX - t.x, dZ = pZ - t.z;
+            let dist = Math.sqrt(dX*dX + dZ*dZ);
+            if(dist > 0) { dX /= dist; dZ /= dist; }
+            let oX, oZ;
+            if(t.isCovered) {
+               oX = t.x + dX * 1.8; oZ = t.z + dZ * 1.8;
+            } else {
+               oX = t.x + dX * 6.0 + j(0, 2); oZ = t.z + dZ * 6.0 + j(0, 2);
+            }
+            
+            let distToPlayer = Math.sqrt((oX - pX)**2 + (oZ - pZ)**2);
+            if (distToPlayer < minDist) {
+               let pushX = oX - pX, pushZ = oZ - pZ;
+               let pushLen = Math.sqrt(pushX*pushX + pushZ*pushZ) || 1;
+               oX = pX + (pushX / pushLen) * minDist;
+               oZ = pZ + (pushZ / pushLen) * minDist;
+            }
+            
+            oX = Math.max(-14, Math.min(14, oX)); oZ = Math.max(-19, Math.min(19, oZ));
+            sc.entities.push({ color: 0x00cc00, x: oX, z: oZ, status: 'opponent', timeOffset: Math.random() * Math.PI * 2 });
+         }
+      }
+      
+      sc.entities.push({ color: 0xffffff, x: j(0,1), z: -17, status: 'opponent_gk' });
+      return sc;
+    }
+
+    function init() {
+      scene = new THREE.Scene(); scene.background = new THREE.Color(0x87ceeb); scene.fog = new THREE.Fog(0x87ceeb, 15, 60);
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+      scene.add(entitiesGroup);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true; document.body.appendChild(renderer.domElement);
+
+      if(!isMobile) {
+        controls = new THREE.PointerLockControls(camera, document.body);
+        controls.addEventListener('lock', () => { document.getElementById('start-screen').style.display = 'none'; isGameRunning = true; });
+        controls.addEventListener('unlock', () => { document.getElementById('start-screen').style.display = 'flex'; isGameRunning = false; });
+      }
+
+      document.getElementById('start-btn').addEventListener('click', () => { 
+        scenarioCount = 1; // Reset progress
+        loadScenario();
+        if(isMobile) {
+          document.getElementById('start-screen').style.display = 'none';
+          document.getElementById('joystick-zone').style.display = 'block';
+          document.getElementById('mobile-hint').style.display = 'block';
+          isGameRunning = true;
+        } else { controls.lock(); }
+      });
+
+      // Inputs
+      document.addEventListener('keydown', (e) => {
+        switch(e.code) { case 'KeyW': moveState.forward = true; break; case 'KeyS': moveState.backward = true; break; case 'KeyA': moveState.left = true; break; case 'KeyD': moveState.right = true; break; }
+      });
+      document.addEventListener('keyup', (e) => {
+        switch(e.code) { case 'KeyW': moveState.forward = false; break; case 'KeyS': moveState.backward = false; break; case 'KeyA': moveState.left = false; break; case 'KeyD': moveState.right = false; break; }
+      });
+      document.body.addEventListener('mousedown', (e) => { if (!isMobile && isGameRunning && !passing) passBall(); });
+
+      // Touch Inputs
+      const joyZone = document.getElementById('joystick-zone'), joyKnob = document.getElementById('joystick-knob');
+      document.body.addEventListener('touchstart', (e) => {
+        if(!isGameRunning) return;
+        for(let i=0; i<e.changedTouches.length; i++) {
+          let t = e.changedTouches[i];
+          if(t.clientX < window.innerWidth / 2) { touchMoveID = t.identifier; updateJoystick(t.clientX, t.clientY); }
+          else { touchLookID = t.identifier; lastLookPos = {x: t.clientX, y: t.clientY}; isTapping = true; }
+        }
+      }, {passive: false});
+
+      document.body.addEventListener('touchmove', (e) => {
+        if(!isGameRunning) return; e.preventDefault();
+        for(let i=0; i<e.changedTouches.length; i++) {
+          let t = e.changedTouches[i];
+          if(t.identifier === touchMoveID) { updateJoystick(t.clientX, t.clientY); }
+          else if(t.identifier === touchLookID) {
+            let dx = t.clientX - lastLookPos.x, dy = t.clientY - lastLookPos.y;
+            lookEuler.y -= dx * 0.005; lookEuler.x -= dy * 0.005; lookEuler.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, lookEuler.x));
+            camera.quaternion.setFromEuler(lookEuler); lastLookPos = {x: t.clientX, y: t.clientY};
+            if(Math.abs(dx) > 5 || Math.abs(dy) > 5) isTapping = false;
+          }
+        }
+      }, {passive: false});
+
+      document.body.addEventListener('touchend', (e) => {
+        if(!isGameRunning) return;
+        for(let i=0; i<e.changedTouches.length; i++) {
+          let t = e.changedTouches[i];
+          if(t.identifier === touchMoveID) { touchMoveID = null; joystickDelta = {x: 0, y: 0}; joyKnob.style.transform = `translate(0px, 0px)`; }
+          else if(t.identifier === touchLookID) { touchLookID = null; if(isTapping && !passing) passBall(); }
+        }
+      });
+
+      function updateJoystick(x, y) {
+        let rect = joyZone.getBoundingClientRect(), cX = rect.left + rect.width / 2, cY = rect.top + rect.height / 2;
+        let dx = x - cX, dy = y - cY, dist = Math.sqrt(dx*dx + dy*dy), maxD = rect.width/2 - 25;
+        if(dist > maxD) { dx = (dx/dist)*maxD; dy = (dy/dist)*maxD; }
+        joyKnob.style.transform = `translate(${dx}px, ${dy}px)`; joystickDelta = { x: dx/maxD, y: dy/maxD };
+      }
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.7); dirLight.position.set(20, 30, 10); dirLight.castShadow = true; scene.add(dirLight);
+
+      createPitch(); createGoal(0, 0, -17.5); createGoal(0, 0, 17.5);
+
+      // High Res Procedural Patrick Ball
+      const bCanvas = document.createElement('canvas'); bCanvas.width = 1024; bCanvas.height = 1024; const bCtx = bCanvas.getContext('2d');
+      bCtx.fillStyle = '#ffffff'; bCtx.fillRect(0,0,1024,1024); 
+      bCtx.fillStyle = '#fff44f'; bCtx.beginPath(); bCtx.moveTo(0,0); bCtx.lineTo(512,0); bCtx.lineTo(256,256); bCtx.fill(); bCtx.beginPath(); bCtx.moveTo(1024,1024); bCtx.lineTo(512,1024); bCtx.lineTo(768,768); bCtx.fill(); bCtx.beginPath(); bCtx.moveTo(0,1024); bCtx.lineTo(0,512); bCtx.lineTo(256,768); bCtx.fill();
+      bCtx.fillStyle = '#87cefa'; bCtx.beginPath(); bCtx.moveTo(1024,0); bCtx.lineTo(512,0); bCtx.lineTo(768,256); bCtx.fill(); bCtx.beginPath(); bCtx.moveTo(1024,512); bCtx.lineTo(1024,1024); bCtx.lineTo(768,768); bCtx.fill();
+      bCtx.strokeStyle = '#222222'; bCtx.lineWidth = 10; bCtx.beginPath(); bCtx.moveTo(0, 512); bCtx.lineTo(1024, 512); bCtx.stroke(); bCtx.beginPath(); bCtx.moveTo(512, 0); bCtx.lineTo(512, 1024); bCtx.stroke(); bCtx.beginPath(); bCtx.arc(512, 512, 250, 0, Math.PI*2); bCtx.stroke();
+      bCtx.fillStyle = '#000000'; bCtx.textAlign = 'center'; bCtx.textBaseline = 'middle'; bCtx.font = '900 120px "Arial Black", sans-serif'; bCtx.fillText('PATRICK', 512, 470); bCtx.font = 'bold 70px Arial'; bCtx.fillText('PRO801', 512, 580);
+      
+      const ballTex = new THREE.CanvasTexture(bCanvas);
+      ballTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      ballTex.minFilter = THREE.LinearMipmapLinearFilter;
+      ball = new THREE.Mesh(new THREE.SphereGeometry(0.35, 64, 64), new THREE.MeshLambertMaterial({ map: ballTex })); 
+      ball.castShadow = true; scene.add(ball);
+
+      animate();
+    }
+
+    const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 3 });
+    function addRect(x, z, w, l) { scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x, 0.02, z), new THREE.Vector3(x+w, 0.02, z), new THREE.Vector3(x+w, 0.02, z+l), new THREE.Vector3(x, 0.02, z+l), new THREE.Vector3(x, 0.02, z)]), lineMat)); }
+    function addLine(x1, z1, x2, z2) { scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x1, 0.02, z1), new THREE.Vector3(x2, 0.02, z2)]), lineMat)); }
+    function addCircle(x, z, r) { const pts = []; for(let i=0; i<=64; i++) pts.push(new THREE.Vector3(x + Math.cos((i/64)*Math.PI*2)*r, 0.02, z + Math.sin((i/64)*Math.PI*2)*r)); scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat)); }
+
+    function createPitch() {
+      const canvas = document.createElement('canvas'); canvas.width = 128; canvas.height = 128; const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#4CAF50'; ctx.fillRect(0,0,128,128); ctx.fillStyle = '#45a049'; ctx.fillRect(0,0,64,128); ctx.fillRect(128,0,64,128); 
+      const grassTex = new THREE.CanvasTexture(canvas); grassTex.wrapS = THREE.RepeatWrapping; grassTex.wrapT = THREE.RepeatWrapping; grassTex.repeat.set(15, 15);
+      const pitch = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshLambertMaterial({ map: grassTex })); pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; scene.add(pitch);
+      addRect(-12.5, -17.5, 25, 35); addLine(-12.5, 0, 12.5, 0); addCircle(0, 0, 3); addRect(-6, -17.5, 12, 5); addRect(-6, 12.5, 12, 5);
+    }
+
+    function createGoal(x, y, z) {
+      const mat = new THREE.MeshLambertMaterial({ color: 0xffffff }), postGeo = new THREE.CylinderGeometry(0.08, 0.08, 2);
+      const postL = new THREE.Mesh(postGeo, mat); postL.position.set(x - 2.5, y + 1, z);
+      const postR = new THREE.Mesh(postGeo, mat); postR.position.set(x + 2.5, y + 1, z);
+      const cross = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 5), mat); cross.rotation.z = Math.PI / 2; cross.position.set(x, y + 2, z);
+      scene.add(postL); scene.add(postR); scene.add(cross);
+    }
+
+    let redShirtMat = null;
+    function getRedShirtMat() {
+      if(redShirtMat) return redShirtMat;
+      const canvas = document.createElement('canvas'); canvas.width = 256; canvas.height = 256; const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#e60000'; ctx.fillRect(0, 0, 256, 256);
+      ctx.fillStyle = '#ffffff'; for(let i=15; i<256; i+=28) ctx.fillRect(i, 0, 3, 256); 
+      ctx.beginPath(); ctx.moveTo(80, 0); ctx.lineTo(176, 0); ctx.lineTo(128, 50); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 4; ctx.textAlign = 'center';
+      ctx.font = 'italic bold 60px "Brush Script MT", cursive, sans-serif'; ctx.fillText('Bos', 128, 120);
+      ctx.font = 'italic 14px Arial'; ctx.fillText('taverne-restaurant', 128, 140);
+      ctx.font = 'bold 26px Arial'; ctx.fillText('DEWITTE', 128, 175); ctx.font = 'bold 11px Arial'; ctx.fillText('POMPSERVICE', 128, 190);
+      ctx.shadowBlur = 0; ctx.font = 'bold 12px Arial'; ctx.fillText('PATRICK', 180, 70);
+      return redShirtMat = new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(canvas) });
+    }
+
+    function createCharacter(colorHex, x, y, z, status, timeOffset) {
+      const group = new THREE.Group(), isOpponent = status.includes('opponent'), isTeammate = (colorHex === 0xff0000);
+      const shirtMat = isTeammate ? getRedShirtMat() : new THREE.MeshLambertMaterial({ color: colorHex }), sleeveMat = isTeammate ? new THREE.MeshLambertMaterial({ color: 0xe60000 }) : shirtMat, skinMat = new THREE.MeshLambertMaterial({ color: 0xffcc99 }), pantsMat = new THREE.MeshLambertMaterial({ color: isTeammate ? 0xe60000 : 0x222222 }), shoesMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+      
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.35, 0.35), skinMat); head.position.y = 1.5; head.castShadow = true; group.add(head);
+      const hair = new THREE.Mesh(new THREE.BoxGeometry(0.37, 0.08, 0.37), new THREE.MeshLambertMaterial({ color: 0x4a3018 })); hair.position.y = 1.7; hair.castShadow = true; group.add(hair);
+      const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 }), eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.04), eyeMat); eyeL.position.set(-0.08, 1.55, 0.18); group.add(eyeL); const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.04), eyeMat); eyeR.position.set(0.08, 1.55, 0.18); group.add(eyeR);
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.55, 0.25), shirtMat); body.position.y = 1.05; body.castShadow = true; group.add(body);
+      const armGeo = new THREE.BoxGeometry(0.16, 0.5, 0.16), armL = new THREE.Mesh(armGeo, skinMat); armL.position.set(-0.35, 1.0, 0); armL.castShadow = true; group.add(armL); const sleeveL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.25, 0.18), sleeveMat); sleeveL.position.set(-0.35, 1.2, 0); sleeveL.castShadow = true; group.add(sleeveL);
+      const armR = new THREE.Mesh(armGeo, skinMat); armR.position.set(0.35, 1.0, 0); armR.castShadow = true; group.add(armR); const sleeveR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.25, 0.18), sleeveMat); sleeveR.position.set(0.35, 1.2, 0); sleeveR.castShadow = true; group.add(sleeveR);
+      const shorts = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.25, 0.27), pantsMat); shorts.position.y = 0.65; shorts.castShadow = true; group.add(shorts);
+      const legGeo = new THREE.BoxGeometry(0.18, 0.45, 0.18), legL = new THREE.Mesh(legGeo, skinMat); legL.position.set(-0.15, 0.3, 0); legL.castShadow = true; group.add(legL); const legR = new THREE.Mesh(legGeo, skinMat); legR.position.set(0.15, 0.3, 0); legR.castShadow = true; group.add(legR);
+      const shoeGeo = new THREE.BoxGeometry(0.2, 0.12, 0.25), shoeL = new THREE.Mesh(shoeGeo, shoesMat); shoeL.position.set(-0.15, 0.06, 0.05); shoeL.castShadow = true; group.add(shoeL); const shoeR = new THREE.Mesh(shoeGeo, shoesMat); shoeR.position.set(0.15, 0.06, 0.05); shoeR.castShadow = true; group.add(shoeR);
+
+      group.position.set(x, y, z);
+      group.userData = { baseX: x, baseZ: z, timeOffset: timeOffset || 0 };
+      const hitbox = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 1.8), new THREE.MeshBasicMaterial({ visible: false })); hitbox.position.y = 0.9; hitbox.userData = { status: status, parentGroup: group }; group.add(hitbox);
+      entitiesGroup.add(group);
+    }
+
+    function loadScenario() {
+      if (scenarioCount > MAX_SCENARIOS) {
+        document.getElementById('start-screen').style.display = 'flex';
+        document.getElementById('start-screen').innerHTML = `
+          <h1 style="font-size:3rem;color:#00ff00;">Sessie Voltooid! 🏆</h1>
+          <p style="font-size:1.5rem;margin:20px;">Je hebt alle 20 situaties perfect uitgespeeld!</p>
+          <button id="restart-btn" style="padding:15px 40px;font-size:1.5rem;background:#e60000;color:white;border:3px solid white;border-radius:10px;cursor:pointer;font-weight:bold;">Opnieuw Spelen</button>`;
+        document.getElementById('restart-btn').onclick = () => location.reload();
+        if(!isMobile) controls.unlock();
+        return;
+      }
+      
+      entitiesGroup.clear();
+      const sc = generateScenario(currentRole, scenarioCount);
+      document.getElementById('scenario-title').innerText = sc.title; document.getElementById('scenario-desc').innerText = sc.desc;
+      camera.position.set(sc.playerPos.x, 1.7, sc.playerPos.z); camera.lookAt(0, 1.7, camera.position.z > 0 ? -17 : 17);
+      lookEuler.setFromQuaternion(camera.quaternion, 'YXZ');
+      hasDribbledIn = !sc.mustDribbleIn; passing = false;
+      sc.entities.forEach(e => createCharacter(e.color, e.x, 0, e.z, e.status, e.timeOffset));
+    }
+
+    function passBall() {
+      const isIndribbel = (entitiesGroup.children.length > 0 && !hasDribbledIn);
+      if (isIndribbel) {
+        if (Math.abs(camera.position.x) < 12 && Math.abs(camera.position.z) < 17) hasDribbledIn = true;
+        else { showMessage("Fout! Je moet eerst indribbelen!\n(Błąd! Najpierw wejdź z piłką!)", "#ff0000", false); return; }
+      }
+
+      raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
+      const hitboxes = []; entitiesGroup.traverse(c => { if (c.userData && c.userData.status) hitboxes.push(c); });
+      const intersects = raycaster.intersectObjects(hitboxes);
+
+      if (intersects.length > 0) {
+        const status = intersects[0].object.userData.status; 
+        passTarget = intersects[0].object.userData.parentGroup.position.clone(); 
+        passTarget.y = 0.35; 
+        passing = true;
+        
+        // Success relies PURELY on whether you physically hit a teammate (open, covered, or keeper) instead of an opponent!
+        if (status === 'open_teammate' || status === 'covered_teammate' || status === 'keeper') {
+           showMessage("Goede pass!\n(Mooie bal!)", "#00ff00", true);
+        } else {
+           showMessage("Onderschept door tegenstander!\n(Przechwyt!)", "#ff0000", false);
+        }
+      } else {
+        const pt = new THREE.Vector3(); raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0), 0), pt);
+        if (pt && pt.distanceTo(camera.position) < 40) { passTarget = pt; passTarget.y = 0.35; passing = true; showMessage("Pass in de ruimte!", "#ffffff", true); }
+      }
+    }
+
+    function showMessage(text, color, success) {
+      const msg = document.getElementById('message'); msg.innerText = text; msg.style.color = color; msg.style.display = 'block';
+      setTimeout(() => { 
+        msg.style.display = 'none'; passing = false; 
+        if (success) { scenarioCount++; loadScenario(); } 
+        else { loadScenario(); } // reload same scenario if failed
+      }, 2500);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const time = performance.now(), delta = (time - prevTime) / 1000; prevTime = time;
+
+      if (isGameRunning) {
+        let vX = 0, vZ = 0;
+        if(isMobile) { vZ = joystickDelta.y * 5; vX = joystickDelta.x * 5; } 
+        else if (controls && controls.isLocked) {
+          let dirZ = Number(moveState.forward) - Number(moveState.backward), dirX = Number(moveState.right) - Number(moveState.left);
+          if (dirZ || dirX) { let d = new THREE.Vector2(dirX, dirZ).normalize(); vX = d.x * 6; vZ = d.y * 6; }
+        }
+
+        if(vX !== 0 || vZ !== 0) {
+          let moveDir = new THREE.Vector3(vX, 0, -vZ); moveDir.applyQuaternion(camera.quaternion); moveDir.y = 0; moveDir.normalize();
+          let speed = Math.sqrt(vX*vX + vZ*vZ); camera.position.add(moveDir.multiplyScalar(speed * delta));
+          if (camera.position.x > 18) camera.position.x = 18; if (camera.position.x < -18) camera.position.x = -18;
+          if (camera.position.z > 22) camera.position.z = 22; if (camera.position.z < -22) camera.position.z = -22;
+        }
+
+        // Active Opponent AI (Pressing)
+        if (!passing && hasDribbledIn) {
+          let opponentPressing = null;
+          entitiesGroup.children.forEach(c => {
+            const st = c.children.find(m => m.userData && m.userData.status)?.userData.status;
+            if(st === 'opponent_press' || st === 'opponent') {
+               if (!opponentPressing) opponentPressing = c;
+               else if (c.position.distanceTo(camera.position) < opponentPressing.position.distanceTo(camera.position)) opponentPressing = c;
+            }
+          });
+
+          if (opponentPressing) {
+             let dist = opponentPressing.position.distanceTo(camera.position);
+             if (dist > 1.2) {
+                let speed = 1.5; // Opponent speed (zmniejszona z 2.5 by dać więcej czasu)
+                let d = new THREE.Vector3().subVectors(camera.position, opponentPressing.position);
+                d.y = 0; d.normalize();
+                opponentPressing.position.add(d.multiplyScalar(speed * delta));
+                // Constrain opponent to pitch
+                opponentPressing.position.x = Math.max(-12.5, Math.min(12.5, opponentPressing.position.x));
+                opponentPressing.position.z = Math.max(-17.5, Math.min(17.5, opponentPressing.position.z));
+             } else {
+                // Te traag!
+                showMessage("Te traag gereageerd! De tegenstander heeft de bal!\n(Za wolno - strata piłki!)", "#ff0000", false);
+                isGameRunning = false;
+             }
+          }
+        }
+      }
+
+      if (passing && passTarget) {
+        const dir = new THREE.Vector3().subVectors(passTarget, ball.position);
+        if (dir.length() > 0.5) { dir.normalize().multiplyScalar(15 * delta); ball.position.add(dir); ball.rotation.x += 0.3; ball.rotation.z -= 0.1; }
+      } else if (isGameRunning) {
+        const camDir = new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion); camDir.y = 0; camDir.normalize();
+        const feetPos = camera.position.clone(); feetPos.y = 0.35; feetPos.add(camDir.multiplyScalar(1.5));
+        ball.position.lerp(feetPos, 0.3);
+        if(joystickDelta.x || joystickDelta.y || moveState.forward || moveState.backward) ball.rotation.x += delta * 5;
+      }
+      
+      entitiesGroup.children.forEach(group => { 
+        const st = group.children.find(m => m.userData && m.userData.status)?.userData.status;
+        if (st === 'open_teammate' || st === 'covered_teammate') {
+           const offset = group.userData.timeOffset;
+           group.position.x = group.userData.baseX + Math.sin(time * 0.0025 + offset) * 2.0;
+           group.position.z = group.userData.baseZ + Math.cos(time * 0.0020 + offset) * 1.5;
+        } else if (st === 'opponent') {
+           const offset = group.userData.timeOffset;
+           group.position.x = group.userData.baseX + Math.sin(time * 0.0018 + offset) * 1.8;
+           group.position.z = group.userData.baseZ + Math.cos(time * 0.0015 + offset) * 1.3;
+        }
+        group.lookAt(camera.position.x, group.position.y, camera.position.z); 
+      });
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+    init();
+  </script>
+</body>
+</html>
