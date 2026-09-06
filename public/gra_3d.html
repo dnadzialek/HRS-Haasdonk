@@ -516,11 +516,17 @@
           entitiesGroup.children.forEach(c => {
              const st = c.children.find(m => m.userData && m.userData.status)?.userData.status;
              if (!st) return;
-             if (c.position.distanceTo(ball.position) < 1.5) {
-                if (st === 'open_teammate' || st === 'covered_teammate' || st === 'keeper') {
-                   showMessage("Goede pass!\n(Mooie bal!)", "#00ff00", true);
-                   hit = true;
-                } else if (st === 'opponent' || st === 'opponent_press') {
+             
+             if (st === 'open_teammate' || st === 'covered_teammate' || st === 'keeper') {
+                if (c.position.distanceTo(ball.position) < 3.5) {
+                   c.position.lerp(new THREE.Vector3(ball.position.x, c.position.y, ball.position.z), 0.15);
+                   if (c.position.distanceTo(ball.position) < 1.5) {
+                      showMessage("Goede pass!\n(Mooie bal!)", "#00ff00", true);
+                      hit = true;
+                   }
+                }
+             } else if (st === 'opponent' || st === 'opponent_press') {
+                if (c.position.distanceTo(ball.position) < 1.5) {
                    showMessage("Onderschept door tegenstander!\n(Przechwyt!)", "#ff0000", false);
                    hit = true;
                 }

@@ -220,9 +220,9 @@
           <div class="goal-left"></div>
           <div class="goal-right"></div>
           
-          <div id="zone-goalkeeper" class="zone zone-goalkeeper" data-role="doelman">
+          <div id="zone-goalkeeper" class="zone zone-goalkeeper" data-role="KEEPER">
             <div class="zone-emoji">🧤</div>
-            <div class="zone-label">DOELMAN<br><span class="hidden sm:inline text-xs font-normal">Uitverdedigen</span></div>
+            <div class="zone-label">KEEPER<br><span class="hidden sm:inline text-xs font-normal">Uitverdedigen</span></div>
           </div>
           
           <div id="zone-defender" class="zone zone-defender" data-role="verdediger">
@@ -262,8 +262,8 @@
 
           <ul class="space-y-4 text-sm flex-1">
             <li class="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-              <div class="font-bold text-yellow-800 text-base mb-1">🧤 Doelman (Keeper)</div>
-              <p class="text-slate-700"><strong>Zone:</strong> Geel (Doelmanszone)</p>
+              <div class="font-bold text-yellow-800 text-base mb-1">🧤 KEEPER (Keeper)</div>
+              <p class="text-slate-700"><strong>Zone:</strong> Geel (KEEPERszone)</p>
               <p class="text-slate-700"><strong>Taken:</strong> Beveiliging van het doel, uitverdedigen (opbouw starten).</p>
             </li>
             
@@ -296,6 +296,10 @@
       </div>
 
     </div>
+    <div style="margin-top: 40px; padding-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto; text-align: center;">
+      <h2 style="color:#2c3e50; font-family: sans-serif; font-weight:900; margin-bottom:15px; text-transform:uppercase;">Regels 5v5</h2>
+      <img src="images/rules_5v5.png" style="width:100%; border-radius:15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);" alt="5v5 rules">
+    </div>
   </div>
 
   <script>
@@ -307,7 +311,7 @@
     const scoreEl = document.getElementById('score');
 
     const tasks = [
-      { role: 'doelman', name: 'Doelman / Keeper (🧤)', desc: 'Verdedigt het doel en start de opbouw.' },
+      { role: 'KEEPER', name: 'KEEPER / Keeper (🧤)', desc: 'Verdedigt het doel en start de opbouw.' },
       { role: 'verdediger', name: 'Verdediger (🛡️)', desc: 'Pakt de bal af en passt naar voren.' },
       { role: 'Linker FLANK', name: 'Linker FLANK / Linksbuiten (🏃‍♂️💨)', desc: 'Rent de hele linkerkant af.' },
       { role: 'Rechter FLANK', name: 'Rechter FLANK / Rechtsbuiten (🏃‍♂️💨)', desc: 'Rent de hele rechterkant af.' },

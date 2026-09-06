@@ -77,6 +77,13 @@ export default function NextMatchPage() {
 
         </div>
       </div>
+
+      <div className="max-w-2xl mx-auto mt-12 mb-20 bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden p-4 md:p-8">
+        <h2 className="text-xl md:text-2xl font-black text-slate-800 uppercase tracking-widest text-center mb-6">Regels 5v5</h2>
+        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-inner border border-slate-100">
+          <Image src="/images/rules_5v5.png" alt="5v5 Rules" fill className="object-contain" />
+        </div>
+      </div>
     </div>
   );
 }
