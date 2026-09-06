@@ -64,14 +64,14 @@ export default function Home() {
     const filesArray = Array.from(e.target.files);
     const newUrls: string[] = [];
     
-    for (const file of filesArray) {
+        for (const file of filesArray) {
       try {
-        const compressedFile = await compressImage(file);
+        const compressed = await compressImage(file) as any;
         
         const formData = new FormData();
-        formData.append("file", compressedFile);
+        formData.append("file", compressed.blob, compressed.name);
         formData.append("upload_preset", "Haasdonk");
-        formData.append("tags", "haasdonk"); // WaÅ¼ne: tag pozwala odnaleÅºÄ‡ te zdjÄ™cia na liÅ›cie
+        formData.append("tags", "haasdonk");
 
         const res = await fetch("https://api.cloudinary.com/v1_1/drclgmym/image/upload", {
           method: "POST",
@@ -81,8 +81,11 @@ export default function Home() {
         const data = await res.json();
         if (data.secure_url) {
           newUrls.push(data.secure_url);
+        } else if (data.error) {
+          alert("Cloudinary b³¹d: " + data.error.message + " Upewnij siê, ¿e upload preset 'Haasdonk' istnieje i jest ustawiony jako Unsigned!");
         }
       } catch (error) {
+        alert("Wyst¹pi³ b³¹d przy wysy³aniu. SprawdŸ po³¹czenie. " + error);
         console.error("Upload error:", error);
       }
     }
@@ -203,3 +206,4 @@ export default function Home() {
     </div>
   );
 }
+
