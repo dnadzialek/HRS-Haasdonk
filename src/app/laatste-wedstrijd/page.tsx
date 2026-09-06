@@ -3,46 +3,10 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-// Pomocnicza funkcja do kompresji zdjÄ™Ä‡ po stronie przeglÄ…darki przed wysÅ‚aniem na serwer
-function compressImage(file: File, maxWidth = 1200): Promise<File> {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (e) => {
-      const img = new window.Image();
-      img.src = e.target?.result as string;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) ctx.drawImage(img, 0, 0, width, height);
-        
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-          } else {
-            resolve(file); // fallback
-          }
-        }, 'image/jpeg', 0.8);
-      };
-    };
-  });
-}
-
 export default function Home() {
   const [cloudPhotos, setCloudPhotos] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Pobieranie zdjÄ™Ä‡ z chmury po wejÅ›ciu na stronÄ™
   useEffect(() => {
     fetch('https://res.cloudinary.com/drclgmym/image/list/haasdonk.json?v=' + Date.now(), { cache: 'no-store' })
       .then(res => res.json())
@@ -64,12 +28,11 @@ export default function Home() {
     const filesArray = Array.from(e.target.files);
     const newUrls: string[] = [];
     
-        for (const file of filesArray) {
+    for (const file of filesArray) {
       try {
-        const compressed = await compressImage(file) as any;
-        
         const formData = new FormData();
-        formData.append("file", compressed.blob, compressed.name);
+        // DIRECT UPLOAD: Bypass canvas compression to support iPhone HEIC images!
+        formData.append("file", file);
         formData.append("upload_preset", "Haasdonk");
         formData.append("tags", "haasdonk");
 
@@ -82,15 +45,14 @@ export default function Home() {
         if (data.secure_url) {
           newUrls.push(data.secure_url);
         } else if (data.error) {
-          alert("Cloudinary b³¹d: " + data.error.message + " Upewnij siê, ¿e upload preset 'Haasdonk' istnieje i jest ustawiony jako Unsigned!");
+          alert("Cloudinary fout: " + data.error.message + " Zorg ervoor dat de upload preset 'Haasdonk' bestaat en is ingesteld op Unsigned!");
         }
       } catch (error) {
-        alert("Wyst¹pi³ b³¹d przy wysy³aniu. SprawdŸ po³¹czenie. " + error);
+        alert("Er is een fout opgetreden bij het uploaden. Controleer de verbinding. " + error);
         console.error("Upload error:", error);
       }
     }
     
-    // Dodajemy nowe zdjÄ™cia na poczÄ…tek galerii
     if (newUrls.length > 0) {
       setCloudPhotos(prev => [...newUrls, ...prev]);
     }
@@ -182,10 +144,10 @@ export default function Home() {
       <div className="flex flex-col md:flex-row justify-between items-end mb-8 border-b border-slate-200 pb-4">
         <div>
           <h2 className="text-3xl font-black text-slate-900">Fotogalerij</h2>
-          <p className="text-slate-500 mt-1 font-medium">ZdjÄ™cia z chmury (widoczne dla wszystkich)</p>
+          <p className="text-slate-500 mt-1 font-medium">Foto&apos;s uit de cloud (voor iedereen zichtbaar)</p>
         </div>
         <label className={`mt-4 md:mt-0 ${isUploading ? 'bg-slate-400 cursor-wait' : 'bg-red-600 hover:bg-red-700 cursor-pointer'} text-white px-6 py-3 rounded-xl font-bold transition-all shadow-[0_4px_14px_0_rgba(220,38,38,0.39)] hover:shadow-[0_6px_20px_rgba(220,38,38,0.23)] hover:-translate-y-0.5`}>
-          {isUploading ? "Trwa wysyÅ‚anie..." : "+ Dodaj zdjÄ™cia"}
+          {isUploading ? "Uploaden..." : "+ Foto's toevoegen"}
           <input type="file" multiple accept="image/*" className="hidden" disabled={isUploading} onChange={handlePhotoUpload} />
         </label>
       </div>
@@ -206,4 +168,3 @@ export default function Home() {
     </div>
   );
 }
-
