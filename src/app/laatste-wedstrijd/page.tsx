@@ -1,17 +1,98 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+// Pomocnicza funkcja do kompresji zdjęć po stronie przeglądarki przed wysłaniem na serwer
+function compressImage(file: File, maxWidth = 1200): Promise<File> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.src = e.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+          } else {
+            resolve(file); // fallback
+          }
+        }, 'image/jpeg', 0.8);
+      };
+    };
+  });
+}
 
 export default function Home() {
-  const [localPhotos, setLocalPhotos] = useState<string[]>([]);
+  const [cloudPhotos, setCloudPhotos] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      const urls = filesArray.map(file => URL.createObjectURL(file));
-      setLocalPhotos(prev => [...prev, ...urls]);
+  // Pobieranie zdjęć z chmury po wejściu na stronę
+  useEffect(() => {
+    fetch('https://res.cloudinary.com/drclgmym/image/list/haasdonk.json')
+      .then(res => res.json())
+      .then(data => {
+        if (data.resources) {
+          const urls = data.resources.map((r: any) => 
+            `https://res.cloudinary.com/drclgmym/image/upload/v${r.version}/${r.public_id}.${r.format}`
+          );
+          setCloudPhotos(urls);
+        }
+      })
+      .catch(err => console.error('Error fetching gallery:', err));
+  }, []);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setIsUploading(true);
+    
+    const filesArray = Array.from(e.target.files);
+    const newUrls: string[] = [];
+    
+    for (const file of filesArray) {
+      try {
+        const compressedFile = await compressImage(file);
+        
+        const formData = new FormData();
+        formData.append("file", compressedFile);
+        formData.append("upload_preset", "Haasdonk");
+        formData.append("tags", "haasdonk"); // Ważne: tag pozwala odnaleźć te zdjęcia na liście
+
+        const res = await fetch("https://api.cloudinary.com/v1_1/drclgmym/image/upload", {
+          method: "POST",
+          body: formData
+        });
+        
+        const data = await res.json();
+        if (data.secure_url) {
+          newUrls.push(data.secure_url);
+        }
+      } catch (error) {
+        console.error("Upload error:", error);
+      }
     }
+    
+    // Dodajemy nowe zdjęcia na początek galerii
+    if (newUrls.length > 0) {
+      setCloudPhotos(prev => [...newUrls, ...prev]);
+    }
+    
+    setIsUploading(false);
   };
 
   const scorers = [
@@ -57,7 +138,7 @@ export default function Home() {
         </div>
 
         <div className="bg-slate-50 border-t border-slate-100 p-4 text-center text-sm font-bold text-slate-500 uppercase tracking-widest">
-          Zaterdag 5 September • Competitie
+          Zaterdag 5 September — Competitie
         </div>
       </div>
 
@@ -98,11 +179,11 @@ export default function Home() {
       <div className="flex flex-col md:flex-row justify-between items-end mb-8 border-b border-slate-200 pb-4">
         <div>
           <h2 className="text-3xl font-black text-slate-900">Fotogalerij</h2>
-          <p className="text-slate-500 mt-1 font-medium">Sfeerbeelden van de wedstrijd</p>
+          <p className="text-slate-500 mt-1 font-medium">Zdjęcia z chmury (widoczne dla wszystkich)</p>
         </div>
-        <label className="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold cursor-pointer transition-all shadow-[0_4px_14px_0_rgba(220,38,38,0.39)] hover:shadow-[0_6px_20px_rgba(220,38,38,0.23)] hover:-translate-y-0.5">
-          + Foto's Toevoegen
-          <input type="file" multiple accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+        <label className={`mt-4 md:mt-0 ${isUploading ? 'bg-slate-400 cursor-wait' : 'bg-red-600 hover:bg-red-700 cursor-pointer'} text-white px-6 py-3 rounded-xl font-bold transition-all shadow-[0_4px_14px_0_rgba(220,38,38,0.39)] hover:shadow-[0_6px_20px_rgba(220,38,38,0.23)] hover:-translate-y-0.5`}>
+          {isUploading ? "Trwa wysyłanie..." : "+ Dodaj zdjęcia"}
+          <input type="file" multiple accept="image/*" className="hidden" disabled={isUploading} onChange={handlePhotoUpload} />
         </label>
       </div>
 
@@ -111,9 +192,10 @@ export default function Home() {
           <Image src="/images/match1.jpg" alt="Gallery" fill className="object-cover transition-transform duration-500 group-hover:scale-110 cursor-pointer" />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none"></div>
         </div>
-        {localPhotos.map((url, i) => (
+        
+        {cloudPhotos.map((url, i) => (
           <div key={i} className="relative aspect-square rounded-2xl overflow-hidden shadow-md border border-slate-200 group bg-slate-200">
-            <Image src={url} alt="Local Upload" fill className="object-cover transition-transform duration-500 group-hover:scale-110 cursor-pointer" />
+            <Image src={url} alt="Cloud Upload" fill className="object-cover transition-transform duration-500 group-hover:scale-110 cursor-pointer" />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none"></div>
           </div>
         ))}
