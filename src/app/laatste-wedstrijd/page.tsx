@@ -44,7 +44,7 @@ export default function Home() {
 
   // Pobieranie zdjęć z chmury po wejściu na stronę
   useEffect(() => {
-    fetch('https://res.cloudinary.com/drclgmym/image/list/haasdonk.json')
+    fetch('https://res.cloudinary.com/drclgmym/image/list/haasdonk.json?v=' + Date.now(), { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data.resources) {
