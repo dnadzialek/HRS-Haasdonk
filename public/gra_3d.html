@@ -33,11 +33,14 @@
     @media (max-width: 768px) {
       #scenario-info { width: calc(100% - 30px); top: auto; bottom: 15px; left: 15px; padding: 10px; }
       #joystick-zone { bottom: 120px; }
-      #mobile-hint { bottom: 120px; }
+            #mobile-pass-btn { bottom: 120px; }
+      #mobile-hint { bottom: 220px; }
       #ui { display: none; }
       #message { font-size: 1.8rem; }
     }
-  </style>
+  
+    #mobile-pass-btn { display: none; position: absolute; bottom: 40px; right: 30px; width: 90px; height: 90px; border-radius: 50%; background: rgba(220,38,38,0.85); border: 3px solid rgba(255,255,255,0.9); color: white; font-weight: 900; font-size: 1.2rem; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 15; user-select: none; touch-action: none; font-family: sans-serif; text-shadow: 1px 1px 2px black; }
+</style>
 </head>
 <body>
   <div id="start-screen">
@@ -79,7 +82,7 @@
   <div id="message"></div>
 
   <div id="joystick-zone"><div id="joystick-knob"></div></div>
-  <div id="mobile-hint">Kijken (Swipe)<br>Passen (Tik)</div>
+  <div id="mobile-hint">Kijken (Swipe)</div><div id="mobile-pass-btn">PASSEN</div>
 
   <!-- Three.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -261,7 +264,7 @@
         if(isMobile) {
           document.getElementById('start-screen').style.display = 'none';
           document.getElementById('joystick-zone').style.display = 'block';
-          document.getElementById('mobile-hint').style.display = 'block';
+          document.getElementById('mobile-hint').style.display = 'block'; document.getElementById('mobile-pass-btn').style.display = 'flex';
           isGameRunning = true;
         } else { controls.lock(); }
       });
@@ -274,6 +277,11 @@
         switch(e.code) { case 'KeyW': moveState.forward = false; break; case 'KeyS': moveState.backward = false; break; case 'KeyA': moveState.left = false; break; case 'KeyD': moveState.right = false; break; }
       });
       document.body.addEventListener('mousedown', (e) => { if (!isMobile && isGameRunning && !passing) passBall(); });
+      document.getElementById('mobile-pass-btn').addEventListener('touchstart', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        if(isGameRunning && !passing) passBall();
+      });
+
 
       // Touch Inputs
       const joyZone = document.getElementById('joystick-zone'), joyKnob = document.getElementById('joystick-knob');
@@ -427,20 +435,15 @@
       const intersects = raycaster.intersectObjects(hitboxes);
 
       if (intersects.length > 0) {
-        const status = intersects[0].object.userData.status; 
-        passTarget = intersects[0].object.userData.parentGroup.position.clone(); 
-        passTarget.y = 0.35; 
-        passing = true;
-        
-        // Success relies PURELY on whether you physically hit a teammate (open, covered, or keeper) instead of an opponent!
-        if (status === 'open_teammate' || status === 'covered_teammate' || status === 'keeper') {
-           showMessage("Goede pass!\n(Mooie bal!)", "#00ff00", true);
-        } else {
-           showMessage("Onderschept door tegenstander!\n(Przechwyt!)", "#ff0000", false);
-        }
+        passTarget = intersects[0].object.userData.parentGroup.position.clone();
       } else {
         const pt = new THREE.Vector3(); raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0), 0), pt);
-        if (pt && pt.distanceTo(camera.position) < 40) { passTarget = pt; passTarget.y = 0.35; passing = true; showMessage("Pass in de ruimte!", "#ffffff", true); }
+        if (pt && pt.distanceTo(camera.position) < 40) passTarget = pt;
+      }
+      
+      if(passTarget) {
+        passTarget.y = 0.35;
+        passing = true;
       }
     }
 
@@ -459,7 +462,7 @@
 
       if (isGameRunning) {
         let vX = 0, vZ = 0;
-        if(isMobile) { vZ = joystickDelta.y * 5; vX = joystickDelta.x * 5; } 
+        if(isMobile) { vZ = -joystickDelta.y * 5; vX = joystickDelta.x * 5; } 
         else if (controls && controls.isLocked) {
           let dirZ = Number(moveState.forward) - Number(moveState.backward), dirX = Number(moveState.right) - Number(moveState.left);
           if (dirZ || dirX) { let d = new THREE.Vector2(dirX, dirZ).normalize(); vX = d.x * 6; vZ = d.y * 6; }
@@ -504,7 +507,30 @@
 
       if (passing && passTarget) {
         const dir = new THREE.Vector3().subVectors(passTarget, ball.position);
-        if (dir.length() > 0.5) { dir.normalize().multiplyScalar(15 * delta); ball.position.add(dir); ball.rotation.x += 0.3; ball.rotation.z -= 0.1; }
+        if (dir.length() > 0.5) { 
+          dir.normalize().multiplyScalar(15 * delta); 
+          ball.position.add(dir); 
+          ball.rotation.x += 0.3; ball.rotation.z -= 0.1; 
+          
+          let hit = false;
+          entitiesGroup.children.forEach(c => {
+             const st = c.children.find(m => m.userData && m.userData.status)?.userData.status;
+             if (!st) return;
+             if (c.position.distanceTo(ball.position) < 1.5) {
+                if (st === 'open_teammate' || st === 'covered_teammate' || st === 'keeper') {
+                   showMessage("Goede pass!\n(Mooie bal!)", "#00ff00", true);
+                   hit = true;
+                } else if (st === 'opponent' || st === 'opponent_press') {
+                   showMessage("Onderschept door tegenstander!\n(Przechwyt!)", "#ff0000", false);
+                   hit = true;
+                }
+             }
+          });
+          if (hit) passing = false;
+        } else {
+          showMessage("Pass in de ruimte! Niemand daar...\n(Podanie w puste pole)", "#ffaaaa", false);
+          passing = false;
+        }
       } else if (isGameRunning) {
         const camDir = new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion); camDir.y = 0; camDir.normalize();
         const feetPos = camera.position.clone(); feetPos.y = 0.35; feetPos.add(camDir.multiplyScalar(1.5));
