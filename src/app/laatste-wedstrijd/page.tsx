@@ -16,7 +16,8 @@ const MATCHES = [
       { name: "Viny", goals: 3 },
     ],
     featuredImage: null,
-    showCloudGallery: true
+    showCloudGallery: true,
+    cloudinaryTag: "zwijndrecht"
   },
   {
     id: 2,
@@ -33,31 +34,36 @@ const MATCHES = [
       { name: "Basiel", goals: 1 },
     ],
     featuredImage: "/images/match1.jpg",
-    showCloudGallery: false
+    showCloudGallery: true,
+    cloudinaryTag: "haasdonk"
   }
 ];
 
 export default function Home() {
-  const [expandedMatch, setExpandedMatch] = useState<number | null>(1); // 1 expanded by default
-  const [cloudPhotos, setCloudPhotos] = useState<string[]>([]);
+  const [expandedMatch, setExpandedMatch] = useState<number | null>(1);
+  const [galleries, setGalleries] = useState<Record<string, string[]>>({});
   const [isUploading, setIsUploading] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch('https://res.cloudinary.com/drclgmym/image/list/haasdonk.json?v=' + Date.now(), { cache: 'no-store' })
-      .then(res => res.json())
-      .then(data => {
-        if (data.resources) {
-          const urls = data.resources.map((r: any) => 
-            `https://res.cloudinary.com/drclgmym/image/upload/v${r.version}/${r.public_id}.${r.format}`
-          );
-          setCloudPhotos(urls);
-        }
-      })
-      .catch(err => console.error('Error fetching gallery:', err));
+    MATCHES.forEach(match => {
+      if (match.showCloudGallery && match.cloudinaryTag) {
+        fetch(`https://res.cloudinary.com/drclgmym/image/list/${match.cloudinaryTag}.json?v=` + Date.now(), { cache: 'no-store' })
+          .then(res => res.json())
+          .then(data => {
+            if (data.resources) {
+              const urls = data.resources.map((r: any) => 
+                `https://res.cloudinary.com/drclgmym/image/upload/v${r.version}/${r.public_id}.${r.format}`
+              );
+              setGalleries(prev => ({ ...prev, [match.cloudinaryTag]: urls }));
+            }
+          })
+          .catch(err => console.error(`Error fetching gallery for ${match.cloudinaryTag}:`, err));
+      }
+    });
   }, []);
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, tag: string) => {
     if (!e.target.files || e.target.files.length === 0) return;
     setIsUploading(true);
     
@@ -69,7 +75,7 @@ export default function Home() {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", "Haasdonk");
-        formData.append("tags", "haasdonk");
+        formData.append("tags", tag);
 
         const res = await fetch("https://api.cloudinary.com/v1_1/drclgmym/image/upload", {
           method: "POST",
@@ -89,7 +95,10 @@ export default function Home() {
     }
     
     if (newUrls.length > 0) {
-      setCloudPhotos(prev => [...newUrls, ...prev]);
+      setGalleries(prev => ({ 
+        ...prev, 
+        [tag]: [...newUrls, ...(prev[tag] || [])] 
+      }));
     }
     
     setIsUploading(false);
@@ -112,7 +121,9 @@ export default function Home() {
           
           let allPhotos: string[] = [];
           if (match.featuredImage) allPhotos.push(match.featuredImage);
-          if (match.showCloudGallery) allPhotos = [...allPhotos, ...cloudPhotos];
+          if (match.showCloudGallery && match.cloudinaryTag) {
+            allPhotos = [...allPhotos, ...(galleries[match.cloudinaryTag] || [])];
+          }
 
           return (
             <div key={match.id} className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.05)] relative transition-all duration-300">
@@ -181,7 +192,7 @@ export default function Home() {
                           </div>
                           <label className={`mt-4 sm:mt-0 ${isUploading ? 'bg-slate-400 cursor-wait' : 'bg-red-600 hover:bg-red-700 cursor-pointer'} text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md text-sm shrink-0`}>
                             {isUploading ? "Uploaden..." : "+ Foto's toevoegen"}
-                            <input type="file" multiple accept="image/*" className="hidden" disabled={isUploading} onChange={handlePhotoUpload} />
+                            <input type="file" multiple accept="image/*" className="hidden" disabled={isUploading} onChange={(e) => handlePhotoUpload(e, match.cloudinaryTag!)} />
                           </label>
                         </div>
                       )}
