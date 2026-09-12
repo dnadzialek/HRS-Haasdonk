@@ -20,25 +20,25 @@ export default function NextMatchPage() {
         <div className="p-6 md:p-8">
           <div className="text-center mb-8">
             <h3 className="text-slate-500 font-bold uppercase tracking-widest text-sm mb-1">COMPETITION</h3>
-            <p className="text-2xl font-black text-slate-800">SEP 12</p>
-            <p className="text-5xl font-black text-red-600 drop-shadow-sm mt-1">9:30 AM</p>
+            <p className="text-2xl font-black text-slate-800">SEP 19</p>
+            <p className="text-5xl font-black text-red-600 drop-shadow-sm mt-1">11:00 AM</p>
           </div>
 
           <div className="flex justify-between items-center mb-10 relative">
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-300 font-black text-2xl italic">VS</div>
             
             <div className="flex flex-col items-center flex-1 text-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-red-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
-                 <Image src="/icon.png" alt="Home Team" fill className="object-contain p-2" />
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-slate-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
+                 <Image src="/images/meerdonk.png" alt="Home Team" fill className="object-contain p-2" />
               </div>
-              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Herleving Red Star<br/>Haasdonk (GU8A)</p>
+              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Ws Meerdonk<br/>(U8)</p>
             </div>
             
             <div className="flex flex-col items-center flex-1 text-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-slate-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
-                <Image src="/images/zwijndrecht.png" alt="Away Team" fill className="object-contain p-2" />
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-red-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
+                <Image src="/icon.png" alt="Away Team" fill className="object-contain p-2" />
               </div>
-              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Verbroedering<br/>Zwijndrecht (U8)</p>
+              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Herleving Red Star<br/>Haasdonk (GU8A)</p>
             </div>
           </div>
 
@@ -61,16 +61,16 @@ export default function NextMatchPage() {
             </div>
           </div>
 
-          <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
-            <h4 className="font-black text-red-800 mb-2 uppercase text-sm tracking-wider">Dressing room</h4>
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 mt-4">
+            <h4 className="font-black text-slate-800 mb-2 uppercase text-sm tracking-wider">Practical info</h4>
             <div className="space-y-3">
               <div>
-                <p className="text-xs text-red-400 font-bold uppercase">Home</p>
-                <p className="text-red-900 font-medium text-sm">Herleving Red Star Haasdonk - Kleedkamer 1 (groot) (Ploegje 1) (14p, 09:30-10:45)</p>
+                <p className="text-xs text-slate-400 font-bold uppercase">Accommodation</p>
+                <p className="text-slate-900 font-medium text-sm">Margrietstraat</p>
               </div>
               <div>
-                <p className="text-xs text-red-400 font-bold uppercase">Away</p>
-                <p className="text-red-900 font-medium text-sm">Herleving Red Star Haasdonk - Kleedkamer 2 (groot) (Ploegje 2) (14p, 09:30-10:45)</p>
+                <p className="text-xs text-slate-400 font-bold uppercase">Address</p>
+                <p className="text-slate-900 font-medium text-sm">Margrietstraat 14, 9170 Meerdonk</p>
               </div>
             </div>
           </div>
@@ -87,3 +87,4 @@ export default function NextMatchPage() {
     </div>
   );
 }
+
