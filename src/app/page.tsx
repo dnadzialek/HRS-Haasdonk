@@ -21,24 +21,24 @@ export default function NextMatchPage() {
           <div className="text-center mb-8">
             <h3 className="text-slate-500 font-bold uppercase tracking-widest text-sm mb-1">COMPETITION</h3>
             <p className="text-2xl font-black text-slate-800">SEP 26</p>
-            <p className="text-5xl font-black text-red-600 drop-shadow-sm mt-1">9:30 AM</p>
+            <p className="text-5xl font-black text-red-600 drop-shadow-sm mt-1">9:00 AM</p>
           </div>
 
           <div className="flex justify-between items-center mb-10 relative">
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-300 font-black text-2xl italic">VS</div>
             
             <div className="flex flex-col items-center flex-1 text-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-red-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
-                 <Image src="/icon.png" alt="Home Team" fill className="object-contain p-2" />
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-slate-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
+                 <Image src="/images/bornem.png" alt="Home Team" fill className="object-contain p-2" />
               </div>
-              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Herleving Red Star<br/>Haasdonk (GU8A)</p>
+              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Ksv Bornem<br/>(U8)</p>
             </div>
             
             <div className="flex flex-col items-center flex-1 text-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-slate-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
-                <Image src="/images/vrasene.png" alt="Away Team" fill className="object-contain p-2" />
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-red-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
+                <Image src="/icon.png" alt="Away Team" fill className="object-contain p-2" />
               </div>
-              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Kfc Vrasene<br/>(U8)</p>
+              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Herleving Red Star<br/>Haasdonk (U8)</p>
             </div>
           </div>
 
@@ -66,11 +66,11 @@ export default function NextMatchPage() {
             <div className="space-y-3">
               <div>
                 <p className="text-xs text-slate-400 font-bold uppercase">Accommodation</p>
-                <p className="text-slate-900 font-medium text-sm">Herleving Red Star Haasdonk</p>
+                <p className="text-slate-900 font-medium text-sm">Domein 'Het Breeven'</p>
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-bold uppercase">Address</p>
-                <p className="text-slate-900 font-medium text-sm">Poerdam 7, 9120 Haasdonk, Belgium</p>
+                <p className="text-slate-900 font-medium text-sm">Breevendreef, 2880 Bornem</p>
               </div>
             </div>
           </div>
