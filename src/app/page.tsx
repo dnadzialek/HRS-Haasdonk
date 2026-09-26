@@ -20,8 +20,8 @@ export default function NextMatchPage() {
         <div className="p-6 md:p-8">
           <div className="text-center mb-8">
             <h3 className="text-slate-500 font-bold uppercase tracking-widest text-sm mb-1">COMPETITION</h3>
-            <p className="text-2xl font-black text-slate-800">SEP 26</p>
-            <p className="text-5xl font-black text-red-600 drop-shadow-sm mt-1">9:00 AM</p>
+            <p className="text-2xl font-black text-slate-800">OCT 3</p>
+            <p className="text-5xl font-black text-red-600 drop-shadow-sm mt-1">9:30 AM</p>
           </div>
 
           <div className="flex justify-between items-center mb-10 relative">
@@ -29,9 +29,9 @@ export default function NextMatchPage() {
             
             <div className="flex flex-col items-center flex-1 text-center">
               <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-slate-100 shadow-md flex items-center justify-center mb-3 relative overflow-hidden p-2">
-                 <Image src="/images/bornem.png" alt="Home Team" fill className="object-contain p-2" />
+                 <Image src="/images/melsele.png" alt="Home Team" fill className="object-contain p-2" />
               </div>
-              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Ksv Bornem<br/>(U8)</p>
+              <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">Kvk Svelta Melsele<br/>(U8)</p>
             </div>
             
             <div className="flex flex-col items-center flex-1 text-center">
@@ -66,11 +66,11 @@ export default function NextMatchPage() {
             <div className="space-y-3">
               <div>
                 <p className="text-xs text-slate-400 font-bold uppercase">Accommodation</p>
-                <p className="text-slate-900 font-medium text-sm">Domein 'Het Breeven'</p>
+                <p className="text-slate-900 font-medium text-sm">Wit Zand</p>
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-bold uppercase">Address</p>
-                <p className="text-slate-900 font-medium text-sm">Breevendreef, 2880 Bornem</p>
+                <p className="text-slate-900 font-medium text-sm">Albrecht Rodenbachlaan 29, 9120 Melsele</p>
               </div>
             </div>
           </div>
