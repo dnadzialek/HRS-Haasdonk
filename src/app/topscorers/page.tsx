@@ -45,7 +45,6 @@ export default function TopScorersPage() {
               <tr className="bg-slate-50 border-b border-slate-100">
                 <th className="p-4 text-slate-400 font-bold text-sm uppercase tracking-wider text-center w-16">#</th>
                 <th className="p-4 text-slate-400 font-bold text-sm uppercase tracking-wider">Speler</th>
-                <th className="p-4 text-slate-400 font-bold text-sm uppercase tracking-wider text-center">Matchen</th>
                 <th className="p-4 text-red-500 font-bold text-sm uppercase tracking-wider text-center">Goals</th>
               </tr>
             </thead>
@@ -66,9 +65,6 @@ export default function TopScorersPage() {
                     {player.name}
                     {index === 0 && <span className="ml-2 text-xl" title="Topschutter">👑</span>}
                   </td>
-                  <td className="p-4 text-center font-medium text-slate-500">
-                    {player.matchesPlayed}
-                  </td>
                   <td className="p-4 text-center font-black text-xl text-red-600">
                     {player.totalGoals}
                   </td>
@@ -76,7 +72,7 @@ export default function TopScorersPage() {
               ))}
               {sortedPlayers.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-slate-400 font-medium italic">
+                  <td colSpan={3} className="p-8 text-center text-slate-400 font-medium italic">
                     Nog geen doelpunten geregistreerd.
                   </td>
                 </tr>
@@ -88,3 +84,4 @@ export default function TopScorersPage() {
     </div>
   );
 }
+
