@@ -7,7 +7,7 @@ export const MATCHES = [
     homeScore: 8,
     awayScore: 16,
     scorers: [
-      { name: "Lucas", goals: 8 },
+      { name: "Lukas", goals: 8 },
       { name: "Viny", goals: 2 },
       { name: "Joachim", goals: 2 },
       { name: "Noah", goals: 2 },
@@ -82,7 +82,7 @@ export const MATCHES = [
       { name: "Gaston", goals: 10 },
       { name: "Noah", goals: 2 },
       { name: "Joachim", goals: 1 },
-      { name: "Lucas", goals: 1 },
+      { name: "Lukas", goals: 1 },
       { name: "Basiel", goals: 1 },
     ],
     featuredImage: "/images/match1.jpg",
