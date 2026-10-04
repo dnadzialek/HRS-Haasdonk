@@ -5,6 +5,25 @@ import { useState, useEffect } from "react";
 
 const MATCHES = [
   {
+    id: -2,
+    date: "Zaterdag 3 Oktober — Competitie",
+    homeTeam: "Kvk Svelta Melsele",
+    awayTeam: "HRS Haasdonk",
+    homeScore: 8,
+    awayScore: 16,
+    scorers: [
+      { name: "Lucas", goals: 8 },
+      { name: "Viny", goals: 2 },
+      { name: "Joachim", goals: 2 },
+      { name: "Noah", goals: 2 },
+      { name: "Alikerim", goals: 1 },
+      { name: "Basiel", goals: 1 },
+    ],
+    featuredImage: null,
+    showCloudGallery: true,
+    cloudinaryTag: "melsele"
+  },
+  {
     id: -1,
     date: "Zaterdag 26 September — Competitie",
     homeTeam: "Ksv Bornem",
@@ -78,7 +97,7 @@ const MATCHES = [
 ];
 
 export default function Home() {
-  const [expandedMatch, setExpandedMatch] = useState<number | null>(-1);
+  const [expandedMatch, setExpandedMatch] = useState<number | null>(-2);
   const [galleries, setGalleries] = useState<Record<string, string[]>>({});
   const [isUploading, setIsUploading] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
