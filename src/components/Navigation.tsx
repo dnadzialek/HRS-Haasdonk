@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -35,6 +35,10 @@ export default function Navigation() {
             <span className="text-xl md:text-2xl group-hover:scale-110 transition-transform">⚽</span>
             <span className="text-[11px] md:text-base text-center md:text-left">Laatste</span>
           </Link>
+          <Link href="/topscorers" className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 py-2 md:py-3 px-2 md:px-4 rounded-xl text-slate-700 hover:bg-red-50 hover:text-red-700 font-bold transition-all group min-w-[70px]">
+            <span className="text-xl md:text-2xl group-hover:scale-110 transition-transform">👑</span>
+            <span className="text-[11px] md:text-base text-center md:text-left">Topschutters</span>
+          </Link>
           <Link href="/quiz" className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 py-2 md:py-3 px-2 md:px-4 rounded-xl text-slate-700 hover:bg-red-50 hover:text-red-700 font-bold transition-all group min-w-[70px]">
             <span className="text-xl md:text-2xl group-hover:scale-110 transition-transform">🧠</span>
             <span className="text-[11px] md:text-base text-center md:text-left">Quiz</span>
@@ -68,3 +72,5 @@ export function MobileHeader() {
     </Link>
   );
 }
+
+
